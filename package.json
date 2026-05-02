@@ -1,0 +1,8 @@
+{
+  "name": "brainrot-fitness-coach",
+  "version": "1.0.0",
+  "description": "Brainrot Fitness Coach - AR Chaos Edition",
+  "scripts": {
+    "dev": "npx -y serve . -l 3000 --no-clipboard"
+  }
+}
