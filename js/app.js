@@ -26,8 +26,7 @@ const App = {
   },
 
   loadLevel() {
-    const saved = localStorage.getItem('bombastic_level');
-    this.currentLevelIndex = saved ? parseInt(saved) : 0;
+    this.currentLevelIndex = 0;
     this.updateLevelDisplay();
   },
 
@@ -40,7 +39,6 @@ const App = {
   incrementLevel() {
     if (this.currentLevelIndex < this.levels.length - 1) {
       this.currentLevelIndex++;
-      localStorage.setItem('bombastic_level', this.currentLevelIndex);
       this.updateLevelDisplay();
     }
   },

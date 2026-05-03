@@ -1,4 +1,4 @@
-# 🧠 Bombastic Workout App (AR Chaos Edition)
+# 🧠 Bombastic Workout App
 
 A web-based fitness app that uses your webcam to detect exercise reps with high-energy meme humor and a progressive leveling system.
 
@@ -13,7 +13,7 @@ A web-based fitness app that uses your webcam to detect exercise reps with high-
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Vanilla HTML5, CSS3, ES6+ JavaScript
+- **Frontend**: HTML, CSS, JavaScript
 - **Vision**: MediaPipe Pose
 - **Audio**: Web Speech API & Web Audio API
 - **Server**: [serve](https://www.npmjs.com/package/serve)
