@@ -46,23 +46,47 @@ const App = {
   },
 
   addRandomEdgeImages() {
-    const numImages = 8;
+    const numImages = 9;
+    const placed = [];
+    const minDistance = 25; // Minimum distance in percentage points
+
     for (let i = 0; i < numImages; i++) {
+      let attempts = 0;
+      let x, y, isLeft, xPerc;
+      
+      while (attempts < 50) {
+        isLeft = Math.random() > 0.5;
+        xPerc = Math.random() * 25 - 10; // -10 to 15
+        x = isLeft ? xPerc : 100 - xPerc;
+        y = Math.random() * 100 - 10;
+        
+        const overlap = placed.some(p => {
+          const dx = p.x - x;
+          const dy = p.y - y;
+          return Math.sqrt(dx*dx + dy*dy) < minDistance;
+        });
+        
+        if (!overlap) break;
+        attempts++;
+      }
+
+      placed.push({ x, y });
+
       const img = document.createElement('img');
       img.src = 'images/completed1.png';
       img.className = 'edge-img';
       img.style.position = 'absolute';
-      img.style.width = (Math.random() * 60 + 60) + 'px';
-      img.style.opacity = '0.3';
+      img.style.width = (Math.random() * 150 + 150) + 'px';
+      img.style.opacity = '0.75';
       img.style.zIndex = '0';
-      const isLeft = Math.random() > 0.5;
+      
       if (isLeft) {
-        img.style.left = (Math.random() * 8 - 2) + '%';
+        img.style.left = xPerc + '%';
       } else {
-        img.style.right = (Math.random() * 8 - 2) + '%';
+        img.style.right = xPerc + '%';
       }
-      img.style.top = (Math.random() * 80 + 10) + '%';
-      img.style.transform = `rotate(${Math.random() * 90 - 45}deg)`;
+      img.style.top = y + '%';
+      img.style.transform = `rotate(${Math.random() * 120 - 60}deg)`;
       img.style.pointerEvents = 'none';
       this.el.screens.home.appendChild(img);
     }
@@ -189,7 +213,7 @@ const App = {
   startCountdown() {
     this.el.countdownOverlay.classList.add('active');
     let count = 5;
-    
+
     const tick = () => {
       if (count > 0) {
         this.el.countdownNumber.textContent = count;
@@ -197,14 +221,14 @@ const App = {
         // Trigger reflow
         void this.el.countdownNumber.offsetWidth;
         this.el.countdownNumber.classList.add('pop');
-        
+
         AudioManager.playTone(600, 0.1, 'square', 0.1);
         count--;
         setTimeout(tick, 1000);
       } else {
         this.el.countdownNumber.textContent = 'GO!';
         AudioManager.playTone(800, 0.3, 'square', 0.2);
-        
+
         setTimeout(() => {
           this.el.countdownOverlay.classList.remove('active');
           this.state.isWorkoutActive = true;
@@ -213,7 +237,7 @@ const App = {
         }, 800);
       }
     };
-    
+
     tick();
   },
 
