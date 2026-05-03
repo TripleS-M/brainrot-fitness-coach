@@ -208,6 +208,7 @@ const App = {
 
   triggerFailure() {
     if (!this.state.isWorkoutActive) return;
+    this.state.isWorkoutActive = false; // Prevent multiple triggers
 
     const quitImages = ['quit1.jpg', 'quit2.jpg', 'quit3.png'];
     const pick = quitImages[Math.floor(Math.random() * quitImages.length)];

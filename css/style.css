@@ -71,6 +71,7 @@ body { font-family: var(--font-body); background: var(--cream); color: var(--dar
   border: 3px solid var(--dark);
   background: #fff;
   border-radius: 4px;
+  box-shadow: 6px 6px 0 var(--dark);
 }
 .home-right {
   flex: 1;
@@ -96,11 +97,14 @@ body { font-family: var(--font-body); background: var(--cream); color: var(--dar
   text-align: left;
   transition: all 0.15s;
   position: relative;
+  box-shadow: 4px 4px 0 var(--dark);
 }
-.exercise-card:hover { background: #f5f5f0; }
+.exercise-card:hover { background: #f5f5f0; transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--dark); }
 .exercise-card.active {
   background: var(--yellow);
   border-color: var(--dark);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--dark);
 }
 .ex-icon { font-size: 1.4rem; flex-shrink: 0; }
 .ex-info { flex: 1; min-width: 0; }
@@ -139,9 +143,11 @@ body { font-family: var(--font-body); background: var(--cream); color: var(--dar
   cursor: pointer;
   font-family: var(--font-body);
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
+  transition: all 0.1s;
+  box-shadow: 3px 3px 0 var(--border);
 }
-.rep-btn:hover { background: #333; }
+.rep-btn:hover { background: #333; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--border); }
+.rep-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--border); }
 #rep-count {
   width: 75px; text-align: center;
   font-size: 2.8rem; font-weight: 900;
@@ -165,6 +171,7 @@ body { font-family: var(--font-body); background: var(--cream); color: var(--dar
   border: 2px solid var(--red);
   border-radius: 4px;
   background: rgba(198, 40, 40, 0.06);
+  box-shadow: 4px 4px 0 var(--red-dark);
 }
 .distraction-title {
   font-weight: 800;
@@ -204,9 +211,10 @@ body { font-family: var(--font-body); background: var(--cream); color: var(--dar
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
+  box-shadow: 6px 6px 0 var(--dark);
 }
-.start-btn:hover { background: var(--red-light); transform: translateY(-2px); box-shadow: 0 4px 0 var(--dark); }
-.start-btn:active { transform: translateY(0); box-shadow: none; }
+.start-btn:hover { background: var(--red-light); transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--dark); }
+.start-btn:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--dark); }
 
 
 
