@@ -1,12 +1,11 @@
-# 🧠 Brainrot Fitness Coach (AR Chaos Edition)
+# 🧠 Bombastic Workout App (AR Chaos Edition)
 
-A web-based fitness app that uses your webcam to detect exercise reps with meme/brainrot humor.
+A web-based fitness app that uses your webcam to detect exercise reps with meme humor.
 
 ## Features
 
 - **Pose Detection** – MediaPipe Pose tracks your body for push-ups, squats & lateral raises
 - **Rep Counter** – Counts down from your target with audio + voice feedback
-- **Distraction Mode** – Random meme overlays & screen shake during your workout
 - **Inactivity Detection** – Stop moving for 5s and get roasted 💀
 - **Success/Failure Screens** – Confetti celebration or skull overlay depending on performance
 

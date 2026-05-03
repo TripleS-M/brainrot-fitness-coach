@@ -69,7 +69,7 @@ const AudioManager = {
     "doing the lord's work", "built different fr", "ohio energy but make it gains"
   ],
   failPhrases: [
-    "bro quit already??", "skill issue fr", "you fell off", "L plus ratio",
+    "bro quit already??", "skill issue fur real", "you fell off", "L plus ratio",
     "not the giving up arc", "bro folded", "where's the effort", "nah this is tragic"
   ],
   successPhrases: [

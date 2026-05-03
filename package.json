@@ -1,7 +1,7 @@
 {
-  "name": "brainrot-fitness-coach",
+  "name": "bombastic-workout-app",
   "version": "1.0.0",
-  "description": "Brainrot Fitness Coach - AR Chaos Edition",
+  "description": "Bombastic Workout App - AR Chaos Edition",
   "scripts": {
     "dev": "npx -y serve . -l 3000 --no-clipboard"
   }

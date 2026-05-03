@@ -1,10 +1,9 @@
-/* ── Brainrot Fitness Coach – Main App ── */
+/* ── Bombastic Workout App – Main App ── */
 const App = {
   state: {
     exerciseType: 'pushup',
     targetReps: 10,
     currentReps: 10,
-    distractionMode: false,
     isWorkoutActive: false,
     screen: 'home',
     result: null,
@@ -13,14 +12,60 @@ const App = {
   },
 
   inactivityTimer: null,
-  distractionTimer: null,
   poseReady: false,
   el: {},
+  levels: ['Chud', 'baby gronk', 'goat', 'gigachad'],
+  currentLevelIndex: 0,
 
   init() {
     this.cacheDOM();
+    this.loadLevel();
+    this.addRandomEdgeImages();
     this.bindEvents();
     this.showScreen('home');
+  },
+
+  loadLevel() {
+    const saved = localStorage.getItem('bombastic_level');
+    this.currentLevelIndex = saved ? parseInt(saved) : 0;
+    this.updateLevelDisplay();
+  },
+
+  updateLevelDisplay() {
+    if (this.el.levelName) {
+      this.el.levelName.textContent = this.levels[this.currentLevelIndex];
+    }
+  },
+
+  incrementLevel() {
+    if (this.currentLevelIndex < this.levels.length - 1) {
+      this.currentLevelIndex++;
+      localStorage.setItem('bombastic_level', this.currentLevelIndex);
+      this.updateLevelDisplay();
+    }
+  },
+
+  addRandomEdgeImages() {
+    const numImages = 8;
+    for (let i = 0; i < numImages; i++) {
+      const img = document.createElement('img');
+      img.src = 'images/completed1.png';
+      img.className = 'edge-img';
+      img.style.position = 'absolute';
+      img.style.width = (Math.random() * 60 + 60) + 'px';
+      img.style.opacity = '0.3';
+      img.style.zIndex = '0';
+      const isLeft = Math.random() > 0.5;
+      if (isLeft) {
+        img.style.left = (Math.random() * 8 - 2) + '%';
+      } else {
+        img.style.right = (Math.random() * 8 - 2) + '%';
+      }
+      img.style.top = (Math.random() * 80 + 10) + '%';
+      img.style.transform = `rotate(${Math.random() * 90 - 45}deg)`;
+      img.style.pointerEvents = 'none';
+      this.el.screens.home.appendChild(img);
+    }
   },
 
   cacheDOM() {
@@ -31,7 +76,7 @@ const App = {
       repInput: q('#rep-count'),
       repMinus: q('#rep-minus'),
       repPlus: q('#rep-plus'),
-      distractionToggle: q('#distraction-toggle'),
+      levelName: q('#level-name'),
       startBtn: q('#start-workout'),
       quitBtn: q('#quit-workout'),
       finishBtn: q('#finish-workout'),
@@ -41,8 +86,6 @@ const App = {
       repNumber: q('#rep-number'),
       exerciseLabel: q('#exercise-label'),
       statusText: q('#status-text'),
-      distractionOverlay: q('#distraction-overlay'),
-      distractionContent: q('#distraction-content'),
       failureOverlay: q('#failure-overlay'),
       successOverlay: q('#success-overlay'),
       confettiCanvas: q('#confetti-canvas'),
@@ -109,7 +152,6 @@ const App = {
     this.state.targetReps = reps;
     this.state.currentReps = reps;
     this.state.totalCompleted = 0;
-    this.state.distractionMode = this.el.distractionToggle.checked;
     this.state.isWorkoutActive = false; // Will be set true after countdown
 
     const names = { pushup: 'PUSH-UPS', squat: 'SQUATS', lateral: 'LATERAL RAISES' };
@@ -168,7 +210,6 @@ const App = {
           this.state.isWorkoutActive = true;
           this.state.lastRepTime = Date.now();
           this.startInactivityCheck();
-          if (this.state.distractionMode) this.startDistractions();
         }, 800);
       }
     };
@@ -226,42 +267,14 @@ const App = {
     }, 2500);
   },
 
-  startDistractions() {
-    this.clearDistractions();
-    const trigger = () => {
-      if (!this.state.isWorkoutActive || !this.state.distractionMode) return;
-      this.showDistraction();
-      this.distractionTimer = setTimeout(trigger, 3000 + Math.random() * 3000);
-    };
-    this.distractionTimer = setTimeout(trigger, 2000 + Math.random() * 2000);
-  },
-
-  clearDistractions() {
-    if (this.distractionTimer) { clearTimeout(this.distractionTimer); this.distractionTimer = null; }
-    this.el.distractionOverlay.classList.remove('active');
-  },
-
-  showDistraction() {
-    const text = AudioManager.getDistractionText();
-    const emojis = ['💀','🤡','👻','🕷️','😱','🔥','⚡','👀','🫠','💅'];
-    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-    this.el.distractionContent.innerHTML =
-      `<div class="distraction-emoji">${emoji}</div><div class="distraction-text">${text}</div>`;
-    this.el.distractionOverlay.classList.add('active');
-    AudioManager.playDistractionSound();
-    document.getElementById('camera-container').classList.add('shake');
-    setTimeout(() => document.getElementById('camera-container').classList.remove('shake'), 500);
-    setTimeout(() => this.el.distractionOverlay.classList.remove('active'), 1500);
-  },
-
   endWorkout(result) {
     this.state.isWorkoutActive = false;
     this.state.result = result;
     this.clearInactivity();
-    this.clearDistractions();
     PoseManager.stop();
 
     if (result === 'success') {
+      this.incrementLevel();
       this.showSuccessOverlay();
     } else {
       this.showEndScreen();
