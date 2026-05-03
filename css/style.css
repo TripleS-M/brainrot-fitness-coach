@@ -113,6 +113,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 @keyframes successPop{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
 @keyframes fireGlow{from{filter:drop-shadow(0 0 10px rgba(245,158,11,.4))}to{filter:drop-shadow(0 0 30px rgba(245,158,11,.8))}}
 
+/* Overlay Image */
+.overlay-image{max-width:300px;max-height:300px;margin:0 auto 1rem;border-radius:var(--radius);box-shadow:0 0 40px rgba(168,85,247,.3);object-fit:cover;display:none}
+
 /* End Screen */
 #end-screen{align-items:center;justify-content:center;padding:2rem 1rem;background:radial-gradient(ellipse at 50% 30%,rgba(168,85,247,.1) 0%,transparent 60%),var(--bg)}
 .end-container{text-align:center;max-width:480px;width:100%;display:flex;flex-direction:column;align-items:center;gap:1.5rem}

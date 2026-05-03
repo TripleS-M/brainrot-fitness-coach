@@ -55,7 +55,9 @@ const App = {
       statExercise: q('#stat-exercise'),
       statCompleted: q('#stat-completed'),
       statTarget: q('#stat-target'),
-      loadingScreen: q('#loading-screen')
+      loadingScreen: q('#loading-screen'),
+      failureImage: q('#failure-image'),
+      successImage: q('#success-image')
     };
   },
 
@@ -190,6 +192,13 @@ const App = {
   triggerFailure() {
     if (!this.state.isWorkoutActive) return;
     /* Show failure overlay */
+    
+    // Choose random failure image
+    const quitImages = ['quit1.jpg', 'quit2.jpg', 'quit3.png'];
+    const randomQuit = quitImages[Math.floor(Math.random() * quitImages.length)];
+    this.el.failureImage.src = `images/${randomQuit}`;
+    this.el.failureImage.style.display = 'block';
+
     this.el.failureOverlay.classList.add('active');
     AudioManager.playFailureSound();
     AudioManager.speak(AudioManager.getFailPhrase());
@@ -197,6 +206,7 @@ const App = {
     /* After 2.5s, go to end screen */
     setTimeout(() => {
       this.el.failureOverlay.classList.remove('active');
+      this.el.failureImage.style.display = 'none';
       this.endWorkout('failure');
     }, 2500);
   },
@@ -256,12 +266,19 @@ const App = {
   },
 
   showSuccessOverlay() {
+    // Choose random success image
+    const completedImages = ['completed1.png', 'completed2.png', 'completed3.jpg', 'completed4.jpg'];
+    const randomCompleted = completedImages[Math.floor(Math.random() * completedImages.length)];
+    this.el.successImage.src = `images/${randomCompleted}`;
+    this.el.successImage.style.display = 'block';
+
     this.el.successOverlay.classList.add('active');
     AudioManager.playSuccessSound();
     AudioManager.speak(AudioManager.getSuccessPhrase());
     ConfettiManager.start('confetti-canvas');
     setTimeout(() => {
       this.el.successOverlay.classList.remove('active');
+      this.el.successImage.style.display = 'none';
       ConfettiManager.stop();
       this.showEndScreen();
     }, 3500);
