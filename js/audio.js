@@ -49,17 +49,6 @@ const AudioManager = {
     });
   },
 
-  playDistractionSound() {
-    const r = Math.random();
-    if (r < 0.33) { this.playTone(200 + Math.random() * 800, 0.15, 'sawtooth'); }
-    else if (r < 0.66) {
-      for (let i = 0; i < 4; i++) setTimeout(() => this.playTone(400 + i * 200, 0.06, 'square'), i * 60);
-    } else {
-      this.playTone(1200, 0.08, 'sine');
-      setTimeout(() => this.playTone(800, 0.08, 'sine'), 100);
-    }
-  },
-
   /* ── Phrase Banks ── */
   repPhrases: [
     "LOCK IN", "that was clean", "form kinda sus", "GYATT", "no cap that was fire",
@@ -77,16 +66,8 @@ const AudioManager = {
     "W human specimen", "certified sigma", "that was actually goated",
     "absolutely unhinged performance", "built different", "THE RIZZ IS REAL"
   ],
-  distractionTexts: [
-    "IS THAT A SPIDER?? 🕷️", "your crush is watching 👀", "PLOT TWIST 😱",
-    "wrong exercise bro 💀", "the gym bros are judging 🫣", "you forgot leg day 🦵",
-    "POV: you're cooked 🍳", "erm... what the sigma? 🤔", "QUICK LOOK BEHIND YOU 👻",
-    "ohio moment 💀", "this is NOT skibidi 😤", "imagine if you actually tried 😭"
-  ],
-
   randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
   getRepPhrase() { return this.randomFrom(this.repPhrases); },
   getFailPhrase() { return this.randomFrom(this.failPhrases); },
-  getSuccessPhrase() { return this.randomFrom(this.successPhrases); },
-  getDistractionText() { return this.randomFrom(this.distractionTexts); }
+  getSuccessPhrase() { return this.randomFrom(this.successPhrases); }
 };

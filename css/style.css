@@ -182,8 +182,6 @@ body { font-family: var(--font-body); background: var(--cream); color: var(--dar
 #rep-count:focus { outline: none; }
 .rep-dot { color: #aaa; font-size: 0.5rem; margin-top: 0.2rem; }
 
-
-
 /* Start Button */
 .start-btn {
   width: 100%; max-width: 680px;
@@ -228,8 +226,6 @@ body { font-family: var(--font-body); background: var(--cream); color: var(--dar
 .rep-label { font-size: .65rem; font-weight: 700; letter-spacing: 1.5px; color: #999; margin-top: .2rem; }
 .hud-bottom { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 5; }
 .status-text { background: rgba(0,0,0,.7); padding: .5rem 1.2rem; border-radius: 20px; font-weight: 700; font-size: .9rem; color: #fff; border: 1px solid #444; white-space: nowrap; }
-
-
 
 .countdown-overlay { position: absolute; inset: 0; z-index: 15; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.7); pointer-events: none; opacity: 0; transition: opacity .2s; }
 .countdown-overlay.active { opacity: 1; }

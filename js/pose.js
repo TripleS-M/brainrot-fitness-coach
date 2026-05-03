@@ -10,7 +10,6 @@ const PoseManager = {
   onRepCallback: null,
   onStatusCallback: null,
   isRunning: false,
-  smoothedLandmarks: null,
 
   /* ── Initialize MediaPipe Pose ── */
   async init(videoEl, canvasEl, onRep, onStatus) {

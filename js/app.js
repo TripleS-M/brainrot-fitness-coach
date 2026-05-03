@@ -1,5 +1,16 @@
 /* ── Bombastic Workout App – Main App ── */
+
+/* ── Shared Constants ── */
+const EXERCISE_NAMES = { pushup: 'PUSH-UPS', squat: 'SQUATS', lateral: 'LATERAL RAISES' };
+const SUCCESS_IMAGES = ['completed1.png', 'completed2.png', 'completed3.jpg', 'completed4.jpg'];
+const FAILURE_IMAGES = ['quit1.jpg', 'quit2.jpg', 'quit3.png'];
+const LEVELS = ['Chud', 'baby gronk', 'goat', 'gigachad'];
+
+/** Pick a random element from an array. */
+function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
 const App = {
+  /* ── Application State ── */
   state: {
     exerciseType: 'pushup',
     targetReps: 10,
@@ -14,78 +25,70 @@ const App = {
   inactivityTimer: null,
   poseReady: false,
   el: {},
-  levels: ['Chud', 'baby gronk', 'goat', 'gigachad'],
   currentLevelIndex: 0,
 
+  /* ── Initialization ── */
   init() {
     this.cacheDOM();
-    this.loadLevel();
+    this.currentLevelIndex = 0;
+    this.updateLevelDisplay();
     this.addRandomEdgeImages();
     this.bindEvents();
     this.showScreen('home');
   },
 
-  loadLevel() {
-    this.currentLevelIndex = 0;
-    this.updateLevelDisplay();
-  },
-
+  /* ── Level System ── */
   updateLevelDisplay() {
     if (this.el.levelName) {
-      this.el.levelName.textContent = this.levels[this.currentLevelIndex];
+      this.el.levelName.textContent = LEVELS[this.currentLevelIndex];
     }
   },
 
   incrementLevel() {
-    if (this.currentLevelIndex < this.levels.length - 1) {
+    if (this.currentLevelIndex < LEVELS.length - 1) {
       this.currentLevelIndex++;
       this.updateLevelDisplay();
     }
   },
 
+  /* ── Decorative Edge Images (Home Screen) ── */
   addRandomEdgeImages() {
-    const numImages = 9;
+    const COUNT = 9;
+    const MIN_DISTANCE = 25; // percentage-point spacing
     const placed = [];
-    const minDistance = 25; // Minimum distance in percentage points
 
-    for (let i = 0; i < numImages; i++) {
+    for (let i = 0; i < COUNT; i++) {
       let attempts = 0;
       let x, y, isLeft, xPerc;
-      
+
+      // Find a non-overlapping position
       while (attempts < 50) {
         isLeft = Math.random() > 0.5;
-        xPerc = Math.random() * 25 - 10; // -10 to 15
+        xPerc = Math.random() * 25 - 10;
         x = isLeft ? xPerc : 100 - xPerc;
         y = Math.random() * 100 - 10;
-        
-        const overlap = placed.some(p => {
-          const dx = p.x - x;
-          const dy = p.y - y;
-          return Math.sqrt(dx*dx + dy*dy) < minDistance;
-        });
-        
-        if (!overlap) break;
+
+        const tooClose = placed.some(p =>
+          Math.hypot(p.x - x, p.y - y) < MIN_DISTANCE
+        );
+        if (!tooClose) break;
         attempts++;
       }
-
       placed.push({ x, y });
 
       const img = document.createElement('img');
       img.src = 'images/completed1.png';
       img.className = 'edge-img';
-      img.style.position = 'absolute';
-      img.style.width = (Math.random() * 150 + 150) + 'px';
-      img.style.opacity = '0.75';
-      img.style.zIndex = '0';
-      
-      if (isLeft) {
-        img.style.left = xPerc + '%';
-      } else {
-        img.style.right = xPerc + '%';
-      }
-      img.style.top = y + '%';
-      img.style.transform = `rotate(${Math.random() * 120 - 60}deg)`;
-      img.style.pointerEvents = 'none';
+      Object.assign(img.style, {
+        position: 'absolute',
+        width: `${Math.random() * 150 + 150}px`,
+        opacity: '0.75',
+        zIndex: '0',
+        top: `${y}%`,
+        transform: `rotate(${Math.random() * 120 - 60}deg)`,
+        pointerEvents: 'none',
+        [isLeft ? 'left' : 'right']: `${xPerc}%`
+      });
       this.el.screens.home.appendChild(img);
     }
   },
@@ -174,10 +177,9 @@ const App = {
     this.state.targetReps = reps;
     this.state.currentReps = reps;
     this.state.totalCompleted = 0;
-    this.state.isWorkoutActive = false; // Will be set true after countdown
+    this.state.isWorkoutActive = false; // Set true after countdown
 
-    const names = { pushup: 'PUSH-UPS', squat: 'SQUATS', lateral: 'LATERAL RAISES' };
-    this.el.exerciseLabel.textContent = names[this.state.exerciseType] || 'EXERCISE';
+    this.el.exerciseLabel.textContent = EXERCISE_NAMES[this.state.exerciseType] || 'EXERCISE';
     this.el.repNumber.textContent = reps;
     this.el.statusText.textContent = 'Loading pose detection... 🧠';
 
@@ -193,7 +195,6 @@ const App = {
         );
         this.poseReady = true;
       } else {
-        PoseManager.setExercise(this.state.exerciseType);
         PoseManager.onRepCallback = () => this.onRep();
         PoseManager.onStatusCallback = (msg) => { this.el.statusText.textContent = msg; };
       }
@@ -273,9 +274,7 @@ const App = {
     if (!this.state.isWorkoutActive) return;
     this.state.isWorkoutActive = false; // Prevent multiple triggers
 
-    const quitImages = ['quit1.jpg', 'quit2.jpg', 'quit3.png'];
-    const pick = quitImages[Math.floor(Math.random() * quitImages.length)];
-    this.el.failureImage.src = `images/${pick}`;
+    this.el.failureImage.src = `images/${pickRandom(FAILURE_IMAGES)}`;
     this.el.failureImage.style.display = 'block';
 
     this.el.failureOverlay.classList.add('active');
@@ -304,15 +303,14 @@ const App = {
   },
 
   showSuccessOverlay() {
-    const completedImages = ['completed1.png', 'completed2.png', 'completed3.jpg', 'completed4.jpg'];
-    const pick = completedImages[Math.floor(Math.random() * completedImages.length)];
-    this.el.successImage.src = `images/${pick}`;
+    this.el.successImage.src = `images/${pickRandom(SUCCESS_IMAGES)}`;
     this.el.successImage.style.display = 'block';
 
     this.el.successOverlay.classList.add('active');
     AudioManager.playSuccessSound();
     AudioManager.speak(AudioManager.getSuccessPhrase());
     ConfettiManager.start('confetti-canvas');
+
     setTimeout(() => {
       this.el.successOverlay.classList.remove('active');
       this.el.successImage.style.display = 'none';
@@ -322,40 +320,26 @@ const App = {
   },
 
   showEndScreen() {
-    const s = this.state;
-    const isSuccess = s.result === 'success';
-    const names = { pushup: 'PUSH-UPS', squat: 'SQUATS', lateral: 'LATERAL RAISES' };
-    const exerciseName = names[s.exerciseType] || s.exerciseType;
+    const { result, exerciseType, totalCompleted, targetReps } = this.state;
+    const exerciseName = EXERCISE_NAMES[exerciseType] || exerciseType;
+    const isSuccess = result === 'success';
+
+    this.el.endSuccess.style.display = isSuccess ? 'flex' : 'none';
+    this.el.endFailure.style.display = isSuccess ? 'none' : 'flex';
 
     if (isSuccess) {
-      this.el.endSuccess.style.display = 'flex';
-      this.el.endFailure.style.display = 'none';
-
-      this.el.wReps.textContent = s.totalCompleted;
+      this.el.wReps.textContent = totalCompleted;
       this.el.wExercise.textContent = exerciseName;
-      this.el.wTarget.textContent = s.targetReps;
+      this.el.wTarget.textContent = targetReps;
       this.el.wQuote.innerHTML = `"${AudioManager.getSuccessPhrase()}"`;
-
-      // Show random completed image
-      const completedImages = ['completed1.png', 'completed2.png', 'completed3.jpg', 'completed4.jpg'];
-      const pick = completedImages[Math.floor(Math.random() * completedImages.length)];
-      this.el.endSuccessImg.src = `images/${pick}`;
+      this.el.endSuccessImg.src = `images/${pickRandom(SUCCESS_IMAGES)}`;
       this.el.endSuccessImg.style.display = 'block';
-
       AudioManager.speak(AudioManager.getSuccessPhrase());
     } else {
-      this.el.endSuccess.style.display = 'none';
-      this.el.endFailure.style.display = 'flex';
-
-      this.el.fTarget.textContent = s.targetReps;
-      this.el.fReps.textContent = s.totalCompleted || '???';
-
-      // Show random quit image
-      const quitImages = ['quit1.jpg', 'quit2.jpg', 'quit3.png'];
-      const pick = quitImages[Math.floor(Math.random() * quitImages.length)];
-      this.el.endFailureImg.src = `images/${pick}`;
+      this.el.fTarget.textContent = targetReps;
+      this.el.fReps.textContent = totalCompleted || '???';
+      this.el.endFailureImg.src = `images/${pickRandom(FAILURE_IMAGES)}`;
       this.el.endFailureImg.style.display = 'block';
-
       AudioManager.speak(AudioManager.getFailPhrase());
     }
 
