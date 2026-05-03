@@ -1,6 +1,5 @@
 /* ── Brainrot Fitness Coach – Main App ── */
 const App = {
-  /* ── State ── */
   state: {
     exerciseType: 'pushup',
     targetReps: 10,
@@ -16,11 +15,8 @@ const App = {
   inactivityTimer: null,
   distractionTimer: null,
   poseReady: false,
-
-  /* ── DOM Refs ── */
   el: {},
 
-  /* ── Boot ── */
   init() {
     this.cacheDOM();
     this.bindEvents();
@@ -39,6 +35,7 @@ const App = {
       startBtn: q('#start-workout'),
       quitBtn: q('#quit-workout'),
       finishBtn: q('#finish-workout'),
+      failFinishBtn: q('#fail-finish'),
       video: q('#webcam'),
       canvas: q('#pose-canvas'),
       repNumber: q('#rep-number'),
@@ -49,20 +46,27 @@ const App = {
       failureOverlay: q('#failure-overlay'),
       successOverlay: q('#success-overlay'),
       confettiCanvas: q('#confetti-canvas'),
-      endEmoji: q('#end-emoji'),
-      endTitle: q('#end-title'),
-      endMessage: q('#end-message'),
-      statExercise: q('#stat-exercise'),
-      statCompleted: q('#stat-completed'),
-      statTarget: q('#stat-target'),
-      loadingScreen: q('#loading-screen'),
       failureImage: q('#failure-image'),
-      successImage: q('#success-image')
+      successImage: q('#success-image'),
+      countdownOverlay: q('#countdown-overlay'),
+      countdownNumber: q('#countdown-number'),
+      // End screen elements
+      endSuccess: q('#end-success'),
+      endFailure: q('#end-failure'),
+      endSuccessImg: q('#end-success-img'),
+      endFailureImg: q('#end-failure-img'),
+      // Success stats
+      wReps: q('#w-reps'),
+      wExercise: q('#w-exercise'),
+      wTarget: q('#w-target'),
+      wQuote: q('#w-quote'),
+      // Failure stats
+      fTarget: q('#f-target'),
+      fReps: q('#f-reps')
     };
   },
 
   bindEvents() {
-    /* Exercise selection */
     this.el.exerciseCards.forEach(card => {
       card.addEventListener('click', () => {
         this.el.exerciseCards.forEach(c => c.classList.remove('active'));
@@ -71,29 +75,27 @@ const App = {
       });
     });
 
-    /* Rep counter +/- */
     this.el.repMinus.addEventListener('click', () => {
-      const v = Math.max(1, parseInt(this.el.repInput.value) - 1);
-      this.el.repInput.value = v;
+      this.el.repInput.value = Math.max(1, parseInt(this.el.repInput.value) - 1);
     });
     this.el.repPlus.addEventListener('click', () => {
-      const v = Math.min(100, parseInt(this.el.repInput.value) + 1);
-      this.el.repInput.value = v;
+      this.el.repInput.value = Math.min(100, parseInt(this.el.repInput.value) + 1);
     });
     this.el.repInput.addEventListener('change', () => {
       this.el.repInput.value = Math.max(1, Math.min(100, parseInt(this.el.repInput.value) || 10));
     });
 
-    /* Buttons */
     this.el.startBtn.addEventListener('click', () => this.startWorkout());
     this.el.quitBtn.addEventListener('click', () => this.endWorkout('failure'));
-    this.el.finishBtn.addEventListener('click', () => {
-      this.showScreen('home');
-      this.state.result = null;
-    });
+    this.el.finishBtn.addEventListener('click', () => this.goHome());
+    this.el.failFinishBtn.addEventListener('click', () => this.goHome());
   },
 
-  /* ── Screen Management ── */
+  goHome() {
+    this.showScreen('home');
+    this.state.result = null;
+  },
+
   showScreen(name) {
     Object.values(this.el.screens).forEach(s => s.classList.remove('active'));
     this.el.screens[name].classList.add('active');
@@ -102,17 +104,14 @@ const App = {
     this.el.successOverlay.classList.remove('active');
   },
 
-  /* ── Start Workout ── */
   async startWorkout() {
     const reps = parseInt(this.el.repInput.value) || 10;
     this.state.targetReps = reps;
     this.state.currentReps = reps;
     this.state.totalCompleted = 0;
     this.state.distractionMode = this.el.distractionToggle.checked;
-    this.state.lastRepTime = Date.now();
-    this.state.isWorkoutActive = true;
+    this.state.isWorkoutActive = false; // Will be set true after countdown
 
-    /* Update HUD */
     const names = { pushup: 'PUSH-UPS', squat: 'SQUATS', lateral: 'LATERAL RAISES' };
     this.el.exerciseLabel.textContent = names[this.state.exerciseType] || 'EXERCISE';
     this.el.repNumber.textContent = reps;
@@ -120,7 +119,6 @@ const App = {
 
     this.showScreen('workout');
 
-    /* Init pose detection */
     try {
       PoseManager.setExercise(this.state.exerciseType);
       if (!this.poseReady) {
@@ -143,45 +141,64 @@ const App = {
       return;
     }
 
-    /* Start inactivity detection */
-    this.startInactivityCheck();
-
-    /* Start distraction mode */
-    if (this.state.distractionMode) this.startDistractions();
+    this.startCountdown();
   },
 
-  /* ── Rep Callback ── */
+  startCountdown() {
+    this.el.countdownOverlay.classList.add('active');
+    let count = 5;
+    
+    const tick = () => {
+      if (count > 0) {
+        this.el.countdownNumber.textContent = count;
+        this.el.countdownNumber.classList.remove('pop');
+        // Trigger reflow
+        void this.el.countdownNumber.offsetWidth;
+        this.el.countdownNumber.classList.add('pop');
+        
+        AudioManager.playTone(600, 0.1, 'square', 0.1);
+        count--;
+        setTimeout(tick, 1000);
+      } else {
+        this.el.countdownNumber.textContent = 'GO!';
+        AudioManager.playTone(800, 0.3, 'square', 0.2);
+        
+        setTimeout(() => {
+          this.el.countdownOverlay.classList.remove('active');
+          this.state.isWorkoutActive = true;
+          this.state.lastRepTime = Date.now();
+          this.startInactivityCheck();
+          if (this.state.distractionMode) this.startDistractions();
+        }, 800);
+      }
+    };
+    
+    tick();
+  },
+
   onRep() {
     if (!this.state.isWorkoutActive || this.state.currentReps <= 0) return;
-
     this.state.currentReps--;
     this.state.totalCompleted++;
     this.state.lastRepTime = Date.now();
 
-    /* Update display */
     this.el.repNumber.textContent = this.state.currentReps;
     this.el.repNumber.classList.add('pop');
     setTimeout(() => this.el.repNumber.classList.remove('pop'), 300);
 
-    /* Audio feedback */
     AudioManager.playRepSound();
-    const phrase = AudioManager.getRepPhrase();
-    AudioManager.speak(phrase);
+    AudioManager.speak(AudioManager.getRepPhrase());
 
-    /* Check for completion */
     if (this.state.currentReps <= 0) {
       setTimeout(() => this.endWorkout('success'), 600);
     }
   },
 
-  /* ── Inactivity Detection ── */
   startInactivityCheck() {
     this.clearInactivity();
     this.inactivityTimer = setInterval(() => {
       if (!this.state.isWorkoutActive) return;
-      if (Date.now() - this.state.lastRepTime > 5000) {
-        this.triggerFailure();
-      }
+      if (Date.now() - this.state.lastRepTime > 5000) this.triggerFailure();
     }, 1000);
   },
 
@@ -191,19 +208,16 @@ const App = {
 
   triggerFailure() {
     if (!this.state.isWorkoutActive) return;
-    /* Show failure overlay */
-    
-    // Choose random failure image
+
     const quitImages = ['quit1.jpg', 'quit2.jpg', 'quit3.png'];
-    const randomQuit = quitImages[Math.floor(Math.random() * quitImages.length)];
-    this.el.failureImage.src = `images/${randomQuit}`;
+    const pick = quitImages[Math.floor(Math.random() * quitImages.length)];
+    this.el.failureImage.src = `images/${pick}`;
     this.el.failureImage.style.display = 'block';
 
     this.el.failureOverlay.classList.add('active');
     AudioManager.playFailureSound();
     AudioManager.speak(AudioManager.getFailPhrase());
 
-    /* After 2.5s, go to end screen */
     setTimeout(() => {
       this.el.failureOverlay.classList.remove('active');
       this.el.failureImage.style.display = 'none';
@@ -211,14 +225,12 @@ const App = {
     }, 2500);
   },
 
-  /* ── Distraction Mode ── */
   startDistractions() {
     this.clearDistractions();
     const trigger = () => {
       if (!this.state.isWorkoutActive || !this.state.distractionMode) return;
       this.showDistraction();
-      const delay = 3000 + Math.random() * 3000;
-      this.distractionTimer = setTimeout(trigger, delay);
+      this.distractionTimer = setTimeout(trigger, 3000 + Math.random() * 3000);
     };
     this.distractionTimer = setTimeout(trigger, 2000 + Math.random() * 2000);
   },
@@ -232,25 +244,15 @@ const App = {
     const text = AudioManager.getDistractionText();
     const emojis = ['💀','🤡','👻','🕷️','😱','🔥','⚡','👀','🫠','💅'];
     const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-
     this.el.distractionContent.innerHTML =
       `<div class="distraction-emoji">${emoji}</div><div class="distraction-text">${text}</div>`;
     this.el.distractionOverlay.classList.add('active');
     AudioManager.playDistractionSound();
-
-    /* Screen shake */
     document.getElementById('camera-container').classList.add('shake');
-    setTimeout(() => {
-      document.getElementById('camera-container').classList.remove('shake');
-    }, 500);
-
-    /* Hide after 1.5s */
-    setTimeout(() => {
-      this.el.distractionOverlay.classList.remove('active');
-    }, 1500);
+    setTimeout(() => document.getElementById('camera-container').classList.remove('shake'), 500);
+    setTimeout(() => this.el.distractionOverlay.classList.remove('active'), 1500);
   },
 
-  /* ── End Workout ── */
   endWorkout(result) {
     this.state.isWorkoutActive = false;
     this.state.result = result;
@@ -266,10 +268,9 @@ const App = {
   },
 
   showSuccessOverlay() {
-    // Choose random success image
     const completedImages = ['completed1.png', 'completed2.png', 'completed3.jpg', 'completed4.jpg'];
-    const randomCompleted = completedImages[Math.floor(Math.random() * completedImages.length)];
-    this.el.successImage.src = `images/${randomCompleted}`;
+    const pick = completedImages[Math.floor(Math.random() * completedImages.length)];
+    this.el.successImage.src = `images/${pick}`;
     this.el.successImage.style.display = 'block';
 
     this.el.successOverlay.classList.add('active');
@@ -287,24 +288,43 @@ const App = {
   showEndScreen() {
     const s = this.state;
     const isSuccess = s.result === 'success';
-    const names = { pushup: 'Push-Ups', squat: 'Squats', lateral: 'Lateral Raises' };
+    const names = { pushup: 'PUSH-UPS', squat: 'SQUATS', lateral: 'LATERAL RAISES' };
+    const exerciseName = names[s.exerciseType] || s.exerciseType;
 
-    this.el.endEmoji.textContent = isSuccess ? '🏆' : '💀';
-    this.el.endTitle.textContent = isSuccess ? 'WORKOUT COMPLETE' : 'WORKOUT FAILED';
-    this.el.endTitle.className = 'end-title ' + (isSuccess ? 'success' : 'failure');
-    this.el.statExercise.textContent = names[s.exerciseType] || s.exerciseType;
-    this.el.statCompleted.textContent = s.totalCompleted;
-    this.el.statTarget.textContent = s.targetReps;
-    this.el.endMessage.textContent = isSuccess
-      ? AudioManager.getSuccessPhrase()
-      : AudioManager.getFailPhrase();
+    if (isSuccess) {
+      this.el.endSuccess.style.display = 'flex';
+      this.el.endFailure.style.display = 'none';
+
+      this.el.wReps.textContent = s.totalCompleted;
+      this.el.wExercise.textContent = exerciseName;
+      this.el.wTarget.textContent = s.targetReps;
+      this.el.wQuote.innerHTML = `"${AudioManager.getSuccessPhrase()}"`;
+
+      // Show random completed image
+      const completedImages = ['completed1.png', 'completed2.png', 'completed3.jpg', 'completed4.jpg'];
+      const pick = completedImages[Math.floor(Math.random() * completedImages.length)];
+      this.el.endSuccessImg.src = `images/${pick}`;
+      this.el.endSuccessImg.style.display = 'block';
+
+      AudioManager.speak(AudioManager.getSuccessPhrase());
+    } else {
+      this.el.endSuccess.style.display = 'none';
+      this.el.endFailure.style.display = 'flex';
+
+      this.el.fTarget.textContent = s.targetReps;
+      this.el.fReps.textContent = s.totalCompleted || '???';
+
+      // Show random quit image
+      const quitImages = ['quit1.jpg', 'quit2.jpg', 'quit3.png'];
+      const pick = quitImages[Math.floor(Math.random() * quitImages.length)];
+      this.el.endFailureImg.src = `images/${pick}`;
+      this.el.endFailureImg.style.display = 'block';
+
+      AudioManager.speak(AudioManager.getFailPhrase());
+    }
 
     this.showScreen('end');
-
-    const phrase = isSuccess ? AudioManager.getSuccessPhrase() : AudioManager.getFailPhrase();
-    AudioManager.speak(phrase);
   }
 };
 
-/* ── Launch ── */
 document.addEventListener('DOMContentLoaded', () => App.init());

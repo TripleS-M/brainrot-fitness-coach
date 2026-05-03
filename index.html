@@ -1,70 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Brainrot Fitness Coach - The most chaotic webcam workout experience. Meme-powered exercise tracking with brainrot humor.">
+  <meta name="description" content="Brainrot Fitness Coach - powered by delusion and poor life choices">
   <title>Brainrot Fitness Coach 🧠💪</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
   <!-- ═══ HOME SCREEN ═══ -->
   <div id="home-screen" class="screen active">
-    <div class="home-container">
-      <div class="hero-section">
-        <div class="hero-image-placeholder">
-          <div class="hero-emoji">🏋️‍♂️</div>
+    <header class="home-header">
+      <h1 class="home-title">BRAINROT<br><span class="home-title-sub">FITNESS COACH</span></h1>
+      <p class="home-tagline">← powered by delusion and poor life choices →</p>
+    </header>
+
+    <div class="home-body">
+      <div class="home-left">
+        <div class="meme-panel" id="meme-panel">
+          <!-- empty container for now -->
         </div>
-        <h1 class="glitch-text">BRAINROT FITNESS</h1>
-        <p class="subtitle">AR Chaos Edition 🧠⚡</p>
       </div>
 
-      <div class="section-title">Choose Your Torture</div>
-      <div class="exercise-grid">
+      <div class="home-right">
         <button class="exercise-card active" data-exercise="pushup" id="btn-pushup">
-          <div class="exercise-icon">💪</div>
-          <div class="exercise-name">Push-Ups</div>
-          <div class="exercise-desc">shoulder go up down</div>
+          <span class="ex-icon">💪</span>
+          <div class="ex-info">
+            <div class="ex-name">Push-ups</div>
+            <div class="ex-desc">classic grind</div>
+          </div>
+          <span class="ex-arrow">◄</span>
         </button>
         <button class="exercise-card" data-exercise="squat" id="btn-squat">
-          <div class="exercise-icon">🦵</div>
-          <div class="exercise-name">Squats</div>
-          <div class="exercise-desc">knees go brrr</div>
+          <span class="ex-icon">🦵</span>
+          <div class="ex-info">
+            <div class="ex-name">Squats</div>
+            <div class="ex-desc">leg day 😤</div>
+          </div>
+          <span class="ex-arrow">◄</span>
         </button>
         <button class="exercise-card" data-exercise="lateral" id="btn-lateral">
-          <div class="exercise-icon">🦅</div>
-          <div class="exercise-name">Lateral Raises</div>
-          <div class="exercise-desc">become airplane</div>
+          <span class="ex-icon">🦅</span>
+          <div class="ex-info">
+            <div class="ex-name">Lateral Raises</div>
+            <div class="ex-desc">for the drip</div>
+          </div>
+          <span class="ex-arrow">◄</span>
         </button>
-      </div>
 
-      <div class="section-title">How Many Reps? (be honest 😭)</div>
-      <div class="rep-input-container">
-        <button class="rep-btn" id="rep-minus">−</button>
-        <input type="number" id="rep-count" value="10" min="1" max="100">
-        <button class="rep-btn" id="rep-plus">+</button>
-      </div>
+        <div class="rep-section">
+          <div class="rep-controls">
+            <button class="rep-btn" id="rep-minus">−</button>
+            <input type="number" id="rep-count" value="10" min="1" max="100">
+            <button class="rep-btn" id="rep-plus">+</button>
+          </div>
+          <div class="rep-dot">●</div>
+        </div>
 
-      <div class="toggle-container">
-        <label class="toggle-label" for="distraction-toggle">
-          <span class="toggle-text">😵 Distraction Mode</span>
-          <span class="toggle-desc">random chaos during workout</span>
-        </label>
-        <label class="toggle-switch">
-          <input type="checkbox" id="distraction-toggle">
-          <span class="toggle-slider"></span>
-        </label>
+        <div class="distraction-box">
+          <div class="distraction-info">
+            <div class="distraction-title">DISTRACTION MODE</div>
+            <div class="distraction-desc">😵 chaos enabled</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="distraction-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
       </div>
-
-      <button class="start-btn" id="start-workout">
-        <span class="btn-text">Start Workout 💪</span>
-        <span class="btn-glow"></span>
-      </button>
     </div>
+
+    <button class="start-btn" id="start-workout">START WORKOUT 💪</button>
   </div>
 
   <!-- ═══ WORKOUT SCREEN ═══ -->
@@ -88,57 +101,103 @@
         <div class="distraction-overlay" id="distraction-overlay">
           <div class="distraction-content" id="distraction-content"></div>
         </div>
+        <div class="countdown-overlay" id="countdown-overlay">
+          <div class="countdown-number" id="countdown-number"></div>
+        </div>
       </div>
       <button class="quit-btn" id="quit-workout">✕ Quit</button>
     </div>
   </div>
 
-  <!-- ═══ FAILURE OVERLAY ═══ -->
+  <!-- ═══ FAILURE OVERLAY (brief) ═══ -->
   <div class="failure-overlay" id="failure-overlay">
     <div class="failure-content">
-      <img id="failure-image" class="overlay-image" src="" alt="failure meme" style="display:none;" />
+      <img id="failure-image" class="overlay-image" src="" alt="" style="display:none;" />
       <div class="failure-emoji" id="failure-emoji">💀</div>
       <h2 class="failure-text">bro quit already?? 💀</h2>
       <p class="failure-sub">skill issue fr fr</p>
     </div>
   </div>
 
-  <!-- ═══ SUCCESS OVERLAY ═══ -->
+  <!-- ═══ SUCCESS OVERLAY (brief confetti) ═══ -->
   <div class="success-overlay" id="success-overlay">
     <canvas id="confetti-canvas"></canvas>
     <div class="success-content">
-      <img id="success-image" class="overlay-image" src="" alt="success meme" style="display:none;" />
+      <img id="success-image" class="overlay-image" src="" alt="" style="display:none;" />
       <div class="success-emoji" id="success-emoji">🔥</div>
       <h2 class="success-text">MAIN CHARACTER ARC COMPLETE 🔥</h2>
-      <p class="success-sub">you're literally the protagonist</p>
     </div>
   </div>
 
   <!-- ═══ END SCREEN ═══ -->
   <div id="end-screen" class="screen">
-    <div class="end-container">
-      <div class="end-emoji" id="end-emoji">🏆</div>
-      <h1 class="end-title" id="end-title">Workout Complete</h1>
-      <div class="end-stats">
-        <div class="stat-card">
-          <div class="stat-value" id="stat-exercise">Push-Ups</div>
-          <div class="stat-label">Exercise</div>
+    <!-- SUCCESS VIEW -->
+    <div class="end-success" id="end-success">
+      <div class="floating-shapes">
+        <span class="shape s1">◆</span><span class="shape s2">■</span>
+        <span class="shape s3">◆</span><span class="shape s4">■</span>
+        <span class="shape s5">◆</span><span class="shape s6">●</span>
+      </div>
+      <p class="end-pre">MAIN CHARACTER</p>
+      <h1 class="end-arc">ARC</h1>
+      <h2 class="end-complete">COMPLETE</h2>
+      <div class="end-fire">🔥</div>
+      <p class="end-flavor">the haters said you couldn't do it. they were wrong.<br>(or were they? no they were wrong.
+        you're the goat.)</p>
+      <img id="end-success-img" class="end-meme-img" src="" alt="" style="display:none" />
+      <div class="recap-box green-recap">
+        <h3 class="recap-heading">— SESSION RECAP —</h3>
+        <div class="recap-grid three-col">
+          <div class="recap-cell">
+            <div class="recap-label">REPS CRUSHED</div>
+            <div class="recap-val" id="w-reps">10</div>
+          </div>
+          <div class="recap-cell">
+            <div class="recap-label">EXERCISE</div>
+            <div class="recap-val" id="w-exercise">PUSH-UPS</div>
+          </div>
+          <div class="recap-cell">
+            <div class="recap-label">TARGET</div>
+            <div class="recap-val" id="w-target">10</div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="stat-completed">0</div>
-          <div class="stat-label">Reps Done</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="stat-target">10</div>
-          <div class="stat-label">Target</div>
+        <div class="badge-row">
+          <span class="badge">🐐 GOAT</span><span class="badge">🔥 LOCKED IN</span>
+          <span class="badge">🔥 ON FIRE</span><span class="badge">💪 GAINS SECURED</span>
         </div>
       </div>
-      <div class="end-message" id="end-message">nice work bestie</div>
-      <button class="finish-btn" id="finish-workout">Finish Workout 🏠</button>
+      <div class="quote-box red-quote">
+        <p class="quote-text" id="w-quote">"you are the main character.<br>the gym was the tutorial level.<br>you just
+          unlocked hard mode."</p>
+        <p class="quote-attr">— sun tzu (probably)</p>
+      </div>
+      <button class="end-btn cyan-btn" id="finish-workout">FINISH WORKOUT 🏁</button>
+    </div>
+
+    <!-- FAILURE VIEW -->
+    <div class="end-failure" id="end-failure" style="display:none">
+      <h1 class="fail-title">bro quit<br><span class="fail-red">already??</span> 💀</h1>
+      <p class="fail-sub">the weights were RIGHT THERE. like literally right there.</p>
+      <img id="end-failure-img" class="end-meme-img" src="" alt="" style="display:none" />
+      <div class="recap-box red-recap">
+        <h3 class="recap-heading">— L RECAP —</h3>
+        <div class="recap-grid two-col">
+          <div class="recap-cell">
+            <div class="recap-label">TARGET REPS</div>
+            <div class="recap-val" id="f-target">10</div>
+            <div class="recap-sub">what you planned</div>
+          </div>
+          <div class="recap-cell">
+            <div class="recap-label">REPS DONE</div>
+            <div class="recap-val fail-val" id="f-reps">???</div>
+            <div class="recap-sub">we both know</div>
+          </div>
+        </div>
+      </div>
+      <button class="end-btn red-btn" id="fail-finish">TRY AGAIN</button>
     </div>
   </div>
 
-  <!-- ═══ SCRIPTS ═══ -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
@@ -147,4 +206,5 @@
   <script src="js/pose.js"></script>
   <script src="js/app.js"></script>
 </body>
+
 </html>
